@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View (danh sách) - Đặt trước để ref tồn tại khi parse action -->
+    <record id="view_bank_noti_list" model="ir.ui.view">
+        <field name="name">bank.noti.list</field>
+        <field name="model">bank.noti</field>
+        <field name="arch" type="xml">
+            <list limit="50" create="false" edit="false" delete="false" duplicate="false">
+                <field name="notification_time"/>
+                <field name="bank_account"/>
+                <field name="content"/>
+                <field name="transaction_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action (đặt sau view để ref khớp) -->
+    <record id="action_bank_noti" model="ir.actions.act_window">
+        <field name="name">Thông báo Ngân hàng</field>
+        <field name="res_model">bank.noti</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_bank_noti_list"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có thông báo nào.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item (hiển thị trong Apps) -->
+    <menuitem
+        id="menu_bank_noti_root"
+        name="Bank Noti"
+        sequence="10"
+        action="action_bank_noti"
+        web_icon="bank_noti,static/description/icon.png"/>  <!-- Nếu chưa có icon.png, bỏ thuộc tính này để tránh warning -->
+</odoo>
