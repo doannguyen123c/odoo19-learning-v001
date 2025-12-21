@@ -16,7 +16,7 @@ class BankNoti(models.Model):
 
     notification_time = fields.Datetime(string='Thời gian thông báo')
     bank_account = fields.Char(string='Tài khoản ngân hàng')
-    amount = fields.Char(string='Số tiền')
+    amount = fields.int(string='Số tiền')
     content = fields.Text(string='Nội dung')
     transaction_id = fields.Char(string='Transaction ID', index=True)
 
@@ -78,6 +78,7 @@ class BankNoti(models.Model):
         for item in data_list:
             notif_time_str = item.get('time', False)
             content = item.get('content', '')
+            amount = item.get('amount', '')
             bank_account = item.get('bank_account', '')
             transaction_id = item.get('transaction_id', '')
 
@@ -96,6 +97,7 @@ class BankNoti(models.Model):
             self.create({
                 'notification_time': notif_time_str,
                 'bank_account': bank_account,
+                'amount': amount,
                 'content': content,
                 'transaction_id': transaction_id,
             })

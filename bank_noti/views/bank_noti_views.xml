@@ -8,6 +8,7 @@
             <list limit="50" create="false" edit="false" delete="false" duplicate="false">
                 <field name="notification_time"/>
                 <field name="bank_account"/>
+                <field name="amount"/>
                 <field name="content"/>
                 <field name="transaction_id"/>
             </list>
