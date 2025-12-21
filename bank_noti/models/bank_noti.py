@@ -16,6 +16,7 @@ class BankNoti(models.Model):
 
     notification_time = fields.Datetime(string='Thời gian thông báo')
     bank_account = fields.Char(string='Tài khoản ngân hàng')
+    amount = fields.Char(string='Số tiền')
     content = fields.Text(string='Nội dung')
     transaction_id = fields.Char(string='Transaction ID', index=True)
 
@@ -28,7 +29,7 @@ class BankNoti(models.Model):
         """Cron job: Đồng bộ thông báo ngân hàng. 
         USE_DEMO_DATA = True để test với data giả trước khi dùng URL thật."""
         
-        USE_DEMO_DATA = True  # <--- ĐỔI THÀNH False KHI SẴN SÀNG DÙNG DATA THẬT
+        USE_DEMO_DATA = False  # <--- ĐỔI THÀNH False KHI SẴN SÀNG DÙNG DATA THẬT
         
         count_new = 0
         
@@ -78,13 +79,14 @@ class BankNoti(models.Model):
             notif_time_str = item.get('time', False)
             content = item.get('content', '')
             bank_account = item.get('bank_account', '')
+            transaction_id = item.get('transaction_id', '')
 
             if not notif_time_str or not content or not bank_account:
                 continue  # Bỏ qua record thiếu field chính
 
             # Tạo transaction_id unique bằng MD5 hash (vì API không có ID gốc)
-            unique_str = f"{notif_time_str}{content}{bank_account}"
-            transaction_id = hashlib.md5(unique_str.encode('utf-8')).hexdigest()
+            # unique_str = f"{notif_time_str}{content}{bank_account}"
+            # transaction_id = hashlib.md5(unique_str.encode('utf-8')).hexdigest()
 
             # Kiểm tra duplicate
             if self.search([('transaction_id', '=', transaction_id)], limit=1):
