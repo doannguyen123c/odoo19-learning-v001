@@ -3,6 +3,9 @@
 from odoo import models, fields, api
 import requests
 import logging
+import hashlib
+from datetime import datetime
+import random  # Để tạo data random demo
 
 _logger = logging.getLogger(__name__)
 
@@ -12,7 +15,7 @@ class BankNoti(models.Model):
     _order = 'notification_time desc'
 
     notification_time = fields.Datetime(string='Thời gian thông báo')
-    bank_account = fields.Char(string='Tài khoản ngân hàng')  # Hoặc Integer nếu là số
+    bank_account = fields.Char(string='Tài khoản ngân hàng')
     content = fields.Text(string='Nội dung')
     transaction_id = fields.Char(string='Transaction ID', index=True)
 
@@ -22,98 +25,81 @@ class BankNoti(models.Model):
 
     @api.model
     def fetch_bank_notifications(self):
-        """Method gọi từ cron để poll URL và insert nếu mới"""
-        url = 'https://bimat.2154.123corp.net/response.php'
-        try:
-            response = requests.get(url, timeout=10)  # Timeout 10s tránh treo
-            response.raise_for_status()  # Raise error nếu HTTP không 200
-            # 1. Parse JSON trực tiếp (thay vì parse text thủ công)
+        """Cron job: Đồng bộ thông báo ngân hàng. 
+        USE_DEMO_DATA = True để test với data giả trước khi dùng URL thật."""
+        
+        USE_DEMO_DATA = True  # <--- ĐỔI THÀNH False KHI SẴN SÀNG DÙNG DATA THẬT
+        
+        count_new = 0
+        
+        if USE_DEMO_DATA:
+            # ------------------- CHẾ ĐỘ DEMO: Tạo data random giả lập -------------------
+            _logger.info("Chạy ở chế độ DEMO - Tạo dữ liệu giả lập để test cron")
+            
+            demo_data_list = [
+                {
+                    'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'content': f'Tài khoản nhận được {random.randint(1000000, 10000000)} VND từ chuyển khoản',
+                    'bank_account': '1234567890',  # Tài khoản giả
+                },
+                {
+                    'time': (datetime.now().replace(minute=(datetime.now().minute - 5) % 60)).strftime('%Y-%m-%d %H:%M:%S'),
+                    'content': f'Chuyển khoản thành công {random.randint(500000, 5000000)} VND',
+                    'bank_account': '0987654321',
+                },
+            ]
+            
+            data_list = demo_data_list  # Dùng list giả như API thật
+            
+        else:
+            # ------------------- CHẾ ĐỘ REAL: Crawl từ URL -------------------
+            url = 'https://bimat.2154.123corp.net/response.php'
             try:
+                response = requests.get(url, timeout=15)
+                response.raise_for_status()
+                
                 data_list = response.json()
+                if not isinstance(data_list, list):
+                    _logger.warning("API không trả về danh sách JSON")
+                    return
+                
+            except requests.RequestException as e:
+                _logger.error("Lỗi kết nối URL %s: %s", url, e)
+                return
             except ValueError:
                 _logger.error("Dữ liệu trả về không phải JSON hợp lệ")
                 return
-
-            if not isinstance(data_list, list):
-                _logger.warning("API không trả về danh sách (List)")
+            except Exception as e:
+                _logger.error("Lỗi xử lý response: %s", e)
                 return
 
-            # 2. Duyệt qua từng phần tử trong danh sách (PHP trả về max 5 dòng)
-            count_new = 0
-            for item in data_list:
-                # Dữ liệu từ PHP: {'time', 'content', 'bank_account', 'received_at'}
-                
-                content = item.get('content', '')
-                notif_time = item.get('time', '')
-                bank_account = item.get('bank_account', '')
+        # ------------------- XỬ LÝ CHUNG: Duyệt data và insert nếu mới -------------------
+        for item in data_list:
+            notif_time_str = item.get('time', False)
+            content = item.get('content', '')
+            bank_account = item.get('bank_account', '')
 
-                # 3. Xử lý Transaction ID (Quan trọng)
-                # Vì PHP không trả về transaction_id, ta cần tạo ID duy nhất để check trùng.
-                # Cách tốt nhất: Hash MD5 của (thời gian + nội dung + tài khoản)
-                unique_str = f"{notif_time}{content}{bank_account}"
-                transaction_id = hashlib.md5(unique_str.encode('utf-8')).hexdigest()
+            if not notif_time_str or not content or not bank_account:
+                continue  # Bỏ qua record thiếu field chính
 
-                # Kiểm tra tồn tại trong DB
-                existing = self.search([('transaction_id', '=', transaction_id)], limit=1)
-                if existing:
-                    continue # Bỏ qua nếu đã có
+            # Tạo transaction_id unique bằng MD5 hash (vì API không có ID gốc)
+            unique_str = f"{notif_time_str}{content}{bank_account}"
+            transaction_id = hashlib.md5(unique_str.encode('utf-8')).hexdigest()
 
-                # Tạo mới
-                self.create({
-                    'notification_time': notif_time, # Lưu ý: Cần đảm bảo format ngày tháng khớp với Odoo
-                    'bank_account': bank_account,
-                    'content': content,
-                    'transaction_id': transaction_id, # Lưu hash ID này lại
-                })
-                count_new += 1
-            
-            if count_new > 0:
-                _logger.info(f"Đã đồng bộ thành công {count_new} giao dịch mới.")
+            # Kiểm tra duplicate
+            if self.search([('transaction_id', '=', transaction_id)], limit=1):
+                continue
 
-        except requests.RequestException as e:
-            _logger.error("Lỗi kết nối URL %s: %s", url, e)
-        except Exception as e:
-            _logger.error("Lỗi xử lý dữ liệu: %s", e)
-            
-'''
-            # Endpoint trả về PHP array print → cần parse thủ công (không phải JSON chuẩn)
-            text = response.text.strip()
-            if not text.startswith("array("):
-                _logger.warning("Response không phải array PHP: %s", text)
-                return
-
-            # Parse đơn giản bằng eval (an toàn vì format cố định)
-            data_str = text[6:-1]  # Bỏ "array(" và ")"
-            items = {}
-            for part in data_str.split(','):
-                if '=>' in part:
-                    key, value = part.split('=>', 1)
-                    key = key.strip().strip("'\"")
-                    value = value.strip().strip("'\"")
-                    items[key] = value
-
-            transaction_id = items.get('transaction_id')
-            if not transaction_id:
-                _logger.warning("Không có transaction_id trong response")
-                return
-
-            # Kiểm tra tồn tại
-            existing = self.search([('transaction_id', '=', transaction_id)], limit=1)
-            if existing:
-                _logger.info("Bỏ qua transaction_id đã tồn tại: %s", transaction_id)
-                return
-
-            # Tạo mới
+            # Tạo record mới (Odoo tự convert string datetime nếu format chuẩn)
             self.create({
-                'notification_time': items.get('time'),
-                'bank_account': items.get('bank_account'),
-                'content': items.get('content'),
+                'notification_time': notif_time_str,
+                'bank_account': bank_account,
+                'content': content,
                 'transaction_id': transaction_id,
             })
-            _logger.info("Tạo mới thông báo ngân hàng: %s", transaction_id)
+            count_new += 1
 
-        except requests.RequestException as e:
-            _logger.error("Lỗi khi fetch URL %s: %s", url, e)
-        except Exception as e:
-            _logger.error("Lỗi parse/insert dữ liệu: %s", e)
-            '''
+        if count_new > 0:
+            _logger.info(f"Đồng bộ thành công: {count_new} thông báo mới được tạo.")
+        else:
+            _logger.info("Không có thông báo mới (hoặc tất cả đã tồn tại).")

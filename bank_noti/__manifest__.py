@@ -12,6 +12,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/bank_noti_views.xml',
+        'data/bank_noti_cron.xml',
     ],
     'installable': True,
     'application': True,  # Hiển thị như một App riêng trong menu Apps

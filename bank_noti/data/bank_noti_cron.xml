@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="cron_fetch_bank_notifications" model="ir.cron">
+            <field name="name">Fetch Bank Notifications</field>
+            <field name="model_id" ref="model_bank_noti"/>  <!-- Đảm bảo ref đúng với model của bạn (thường là bank_noti.model_bank_noti) -->
+            <field name="state">code</field>
+            <field name="code">model.fetch_bank_notifications()</field>
+            <field name="interval_number">1</field>  <!-- Test: mỗi 1 phút; production đổi thành 5 nếu cần -->
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>
