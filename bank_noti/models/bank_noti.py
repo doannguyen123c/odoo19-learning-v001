@@ -16,7 +16,7 @@ class BankNoti(models.Model):
 
     notification_time = fields.Datetime(string='Thời gian thông báo')
     bank_account = fields.Char(string='Tài khoản ngân hàng')
-    amount = fields.int(string='Số tiền')
+    amount = fields.Integer(string='Số tiền')
     content = fields.Text(string='Nội dung')
     transaction_id = fields.Char(string='Transaction ID', index=True)
 
@@ -30,6 +30,7 @@ class BankNoti(models.Model):
         USE_DEMO_DATA = True để test với data giả trước khi dùng URL thật."""
         
         USE_DEMO_DATA = False  # <--- ĐỔI THÀNH False KHI SẴN SÀNG DÙNG DATA THẬT
+        # USE_DEMO_DATA = True  # <--- ĐỔI THÀNH False KHI SẴN SÀNG DÙNG DATA THẬT
         
         count_new = 0
         
