@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import AccessError, UserError, ValidationError
 import requests
 import logging
 import hashlib
@@ -23,6 +24,12 @@ class BankNoti(models.Model):
     _sql_constraints = [
         ('transaction_id_unique', 'UNIQUE(transaction_id)', 'Transaction ID đã tồn tại!')
     ]
+    
+    def unlink(self):
+        # Only allow system administrators to delete records
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError(_('Chỉ có quản trị viên mới được phép xóa thông báo ngân hàng.'))
+        return super(BankNoti, self).unlink()
 
     @api.model
     def fetch_bank_notifications(self):

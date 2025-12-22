@@ -6,6 +6,14 @@
         <field name="model">bank.noti</field>
         <field name="arch" type="xml">
             <list limit="50" create="false" edit="false" delete="false" duplicate="false">
+                <header>
+                    <button name="unlink" 
+                            type="object" 
+                            string="Xóa" 
+                            class="oe_highlight" 
+                            groups="base.group_system"
+                            confirm="Bạn có chắc chắn muốn xóa thông báo đã chọn?"/>
+                </header>
                 <field name="notification_time"/>
                 <field name="bank_account"/>
                 <field name="amount"/>
