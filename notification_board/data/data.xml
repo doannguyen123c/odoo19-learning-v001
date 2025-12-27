@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Manually assign Admin User (ID 2) to the Notification Admin group -->
+        <record id="base.user_admin" model="res.users">
+            <field name="groups_id" eval="[(4, ref('notification_board.group_notification_admin'))]"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_notification_board_user,notification.board.user,model_notification_board,base.group_user,1,0,0,0
+access_notification_board_admin,notification.board.admin,model_notification_board,notification_board.group_notification_admin,1,1,1,1
+access_notification_tag_user,notification.tag.user,model_notification_tag,base.group_user,1,0,0,0
+access_notification_tag_admin,notification.tag.admin,model_notification_tag,notification_board.group_notification_admin,1,1,1,1

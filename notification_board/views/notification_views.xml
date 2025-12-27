@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- FORM VIEW -->
+    <record id="view_notification_board_form" model="ir.ui.view">
+        <field name="name">notification.board.form</field>
+        <field name="model">notification.board</field>
+        <field name="arch" type="xml">
+            <form string="Notification">
+                <header>
+                    <button name="action_publish" string="Post Article" type="object" class="oe_highlight" invisible="state == 'published'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    <field name="cover_image" widget="image" class="oe_avatar" options="{'preview_image': 'cover_image', 'size': [90, 90]}"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Article Title..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        </group>
+                    </group>
+                    <separator string="Article Content"/>
+                    <field name="content" widget="html" options="{'style-inline': true, 'resizable': true}" class="oe_form_field_html_content" placeholder="Write your story here..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- LIST VIEW -->
+    <record id="view_notification_board_tree" model="ir.ui.view">
+        <field name="name">notification.board.list</field>
+        <field name="model">notification.board</field>
+        <field name="arch" type="xml">
+            <list string="Notifications">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="create_date"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="state" widget="badge" decoration-success="state == 'published'" decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- KANBAN VIEW -->
+    <record id="view_notification_board_kanban" model="ir.ui.view">
+        <field name="name">notification.board.kanban</field>
+        <field name="model">notification.board</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1" quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="create_date"/>
+                <field name="tag_ids"/>
+                <field name="cover_image"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_image" t-if="record.cover_image.raw_value">
+                                <field name="cover_image" widget="image" class="o_kanban_image_fill_left" options="{'zoom': true, 'background': true}"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title" style="font-size: 16px;"><field name="name"/></strong>
+                                <div class="o_kanban_tags_section">
+                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                </div>
+                                <div class="text-muted">
+                                    <field name="user_id"/> • <field name="create_date"/>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left"></div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="state" widget="label_selection" options="{'classes': {'draft': 'default', 'published': 'success'}}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_notification_board_search" model="ir.ui.view">
+        <field name="name">notification.board.search</field>
+        <field name="model">notification.board</field>
+        <field name="arch" type="xml">
+            <search string="Search Notifications">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="tag_ids"/>
+                <filter string="Published" name="filter_published" domain="[('state', '=', 'published')]"/>
+                <filter string="My Articles" name="filter_my_articles" domain="[('user_id', '=', uid)]"/>
+                <!-- Group By removed for compatibility -->
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_notification_board" model="ir.actions.act_window">
+        <field name="name">Company News</field>
+        <field name="res_model">notification.board</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_published': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No announcements yet!
+            </p>
+            <p>
+                Create a new article to share news with the company.
+            </p>
+        </field>
+    </record>
+
+    <!-- MENU ITEMS -->
+    <menuitem id="menu_notification_board_root"
+              name="News Board"
+              action="action_notification_board"
+              web_icon="base,static/description/icon.png"
+              sequence="1"/>
+
+    <menuitem id="menu_notification_board_list"
+              name="Articles"
+              parent="menu_notification_board_root"
+              action="action_notification_board"
+              sequence="1"/>
+              
+    <!-- Configuration Menu -->
+    <menuitem id="menu_notification_board_config"
+              name="Configuration"
+              parent="menu_notification_board_root"
+              groups="group_notification_admin"
+              sequence="100"/>
+              
+    <!-- Tags Action -->
+    <record id="action_notification_tags" model="ir.actions.act_window">
+        <field name="name">Article Tags</field>
+        <field name="res_model">notification.tag</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_notification_tags"
+              name="Tags"
+              parent="menu_notification_board_config"
+              action="action_notification_tags"
+              sequence="1"/>
+</odoo>

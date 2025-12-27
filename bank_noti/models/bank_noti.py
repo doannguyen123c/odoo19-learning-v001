@@ -50,11 +50,15 @@ class BankNoti(models.Model):
                     'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                     'content': f'Tài khoản nhận được {random.randint(1000000, 10000000)} VND từ chuyển khoản',
                     'bank_account': '1234567890',  # Tài khoản giả
+                    'amount': random.randint(500000, 5000000),
+                    'transaction_id': str(random.randint(500000, 5000000)),
                 },
                 {
                     'time': (datetime.now().replace(minute=(datetime.now().minute - 5) % 60)).strftime('%Y-%m-%d %H:%M:%S'),
                     'content': f'Chuyển khoản thành công {random.randint(500000, 5000000)} VND',
                     'bank_account': '0987654321',
+                    'amount': random.randint(500000, 5000000),
+                    'transaction_id': str(random.randint(500000, 5000000)),
                 },
             ]
             

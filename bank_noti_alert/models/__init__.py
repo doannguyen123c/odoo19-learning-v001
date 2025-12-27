@@ -1,0 +1,1 @@
+from . import bank_noti_extension

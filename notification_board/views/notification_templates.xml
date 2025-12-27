@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="notification_list" name="Notification List">
+        <t t-call="web.layout">
+            <t t-set="title">Thông báo nội bộ</t>
+            <div class="container mt-3">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h1>Thông báo nội bộ</h1>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="list-group">
+                            <t t-foreach="notifications" t-as="notification">
+                                <a t-att-href="'/notification_board/%s' % notification.id" 
+                                   class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1" t-esc="notification.name"/>
+                                        <small t-esc="notification.create_date" 
+                                               t-options='{"widget": "date", "format": "dd/MM/yyyy HH:mm"}'/>
+                                    </div>
+                                    <p class="mb-1" t-esc="notification.content" t-options='{"widget": "html"}'/>
+                                    <small>Người đăng: <t t-esc="notification.user_id.name"/></small>
+                                </a>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="notification_detail" name="Notification Detail">
+        <t t-call="web.layout">
+            <t t-set="title" t-value="notification.name"/>
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="/notification_board">Thông báo</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page" t-esc="notification.name"/>
+                            </ol>
+                        </nav>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 t-esc="notification.name"/>
+                                <div class="text-muted small">
+                                    <span t-esc="notification.user_id.name"/> • 
+                                    <span t-esc="notification.create_date" 
+                                          t-options='{"widget": "date", "format": "dd/MM/yyyy HH:mm"}'/>
+                                    <t t-if="notification.write_date != notification.create_date">
+                                        (Cập nhật lần cuối: 
+                                        <span t-esc="notification.write_date" 
+                                              t-options='{"widget": "date", "format": "dd/MM/yyyy HH:mm"}'/>)
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="card-body" t-field="notification.content" t-options='{"widget": "html"}'/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
