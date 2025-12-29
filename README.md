@@ -1,7 +1,8 @@
 # Odoo Project: Custom Sales & Notifications
 **Author:** Diego Nguyen  
 **Odoo Version:** 19.0 (Developer Preview / Master)
-(Lưu ý: Văn do vợ 2 viết, tôi không biết gì cả)
+
+`(Lưu ý: Văn do vợ 2 viết, tôi không biết gì cả)`
 
 Dự án này bao gồm các modules tùy chỉnh (custom addons) cho hệ thống Odoo ERP, tập trung vào quy trình Bán hàng (Sales), Kế toán (Accounting) và Truyền thông nội bộ (Internal Communication).
 
