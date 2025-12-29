@@ -7,8 +7,7 @@ class NotificationBoardController(http.Controller):
         NotificationBoard = request.env['notification.board']
         domain = [('is_published', '=', True)]
         
-        # Pagination
-        page_count = 10  # Number of notifications per page
+        page_count = 10
         notification_count = NotificationBoard.search_count(domain)
         pager = request.website.pager(
             url='/notification_board',
@@ -38,7 +37,6 @@ class NotificationBoardController(http.Controller):
         if not notification.exists() or not notification.is_published:
             return request.redirect('/notification_board')
             
-        # Mark as read if the current user hasn't read it yet
         if notification.sudo().message_needaction:
             notification.sudo().message_set_read(notification.ids)
             

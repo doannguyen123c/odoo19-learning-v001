@@ -6,20 +6,18 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             
-            <!-- Feature 1: Virtual VAT Toggle -->
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="apply_virtual_vat" widget="boolean_toggle"/>
             </xpath>
 
-            <!-- Feature 1: Virtual VAT Tab -->
             <xpath expr="//notebook" position="inside">
                 <page string="Virtual VAT" name="virtual_vat" invisible="not apply_virtual_vat">
                     <div class="mb-3">
                         <button name="action_copy_to_virtual" string="Copy Real Lines" type="object" class="btn btn-primary" icon="fa-copy"/>
                         <span class="text-muted ms-2">Click to populate with real order lines. Existing virtual lines will be replaced.</span>
                     </div>
-                    <field name="virtual_line_ids" mode="tree">
-                        <tree string="Virtual VAT Lines" editable="bottom" create="0">
+                    <field name="virtual_line_ids" mode="list">
+                        <list string="Virtual VAT Lines" editable="bottom" create="0">
                             <field name="product_id" readonly="1" options="{'no_open': True}"/>
                             <field name="name"/>
                             <field name="product_uom_qty" readonly="1"/>
@@ -28,11 +26,10 @@
                             <field name="tax_ids" widget="many2many_tags"/>
                             <field name="price_subtotal" widget="monetary"/>
                             <field name="currency_id" column_invisible="True"/>
-                        </tree>
+                        </list>
                     </field>
                      <group name="note_group" col="6" class="mt-2 mt-md-0">
                         <group colspan="4">
-                            <!-- Placeholder for notes or other info if needed -->
                         </group>
                         <group class="oe_subtotal_footer" colspan="2" name="virtual_sale_total">
                             <field name="virtual_amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
@@ -47,30 +44,32 @@
                 </page>
             </xpath>
 
-            <!-- Feature 2: Combo Visuals -->
-            <!-- Add helper fields to the list view -->
-            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+            <xpath expr="//field[@name='order_line']/list/field[@name='name']" position="after">
                <field name="is_combo_child" column_invisible="True"/>
+               <field name="is_combo_parent" column_invisible="True"/>
                <field name="parent_line_id" optional="hide"/>
             </xpath>
             
-            <!-- Apply visual distinction (muted text) for child lines -->
-             <xpath expr="//field[@name='order_line']/tree" position="attributes">
+             <xpath expr="//field[@name='order_line']/list" position="attributes">
                 <attribute name="decoration-muted">is_combo_child</attribute>
+                <attribute name="decoration-bf">is_combo_parent</attribute>
             </xpath>
 
-            <!-- Make fields readonly for combo children -->
-            <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="attributes">
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_id']" position="attributes">
                 <attribute name="readonly">is_combo_child</attribute>
             </xpath>
-            <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="attributes">
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_unit']" position="attributes">
                 <attribute name="readonly">is_combo_child</attribute>
             </xpath>
-            <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+            <xpath expr="//field[@name='order_line']/list/field[@name='tax_ids']" position="attributes">
                 <attribute name="readonly">is_combo_child</attribute>
             </xpath>
-            <xpath expr="//field[@name='order_line']/tree/field[@name='tax_ids']" position="attributes">
+             <xpath expr="//field[@name='order_line']/list/field[@name='discount']" position="attributes">
                 <attribute name="readonly">is_combo_child</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']/list" position="inside">
+                 <button name="action_open_combo_wizard" type="object" icon="fa-puzzle-piece" title="Add Components" invisible="is_combo_child"/>
             </xpath>
 
         </field>

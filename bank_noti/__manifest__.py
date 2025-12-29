@@ -15,6 +15,6 @@
         'data/bank_noti_cron.xml',
     ],
     'installable': True,
-    'application': True,  # Hiển thị như một App riêng trong menu Apps
+    'application': True,
     'auto_install': False,
 }

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo import models, api, _
 import logging
 
@@ -14,14 +13,10 @@ class BankNoti(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        # Create records normally
         records = super(BankNoti, self).create(vals_list)
         
-        # Logic to notify users
-        # Try to find the 'BankNoti' channel
         channel = self.env['discuss.channel'].search([('name', 'ilike', 'BankNoti')], limit=1)
         
-        # Fallback if 'BankNoti' isn't found, pick the first available channel
         if not channel:
             channel = self.env['discuss.channel'].search([], limit=1)
 
@@ -30,7 +25,6 @@ class BankNoti(models.Model):
             for record in records:
                 amount_formatted = f"{record.amount:,.0f}" if record.amount else "0"
                 
-                # Use Markup to render HTML tags correctly.
                 msg_body = Markup(
                     "<p>📢 <b>New Bank Transaction Detected</b></p>"
                     "<ul style='list-style-type: none; padding-left: 0;'>"

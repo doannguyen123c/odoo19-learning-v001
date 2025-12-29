@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_sale_order_virtual_line,sale.order.virtual.line,model_sale_order_virtual_line,sales_team.group_sale_salesman,1,1,1,1
-access_product_combo_line,product.combo.line,model_product_combo_line,base.group_user,1,1,1,1
+access_sale_combo_wizard,sale.combo.wizard,model_sale_combo_wizard,sales_team.group_sale_salesman,1,1,1,1
+access_sale_combo_wizard_line,sale.combo.wizard.line,model_sale_combo_wizard_line,sales_team.group_sale_salesman,1,1,1,1

@@ -31,7 +31,6 @@ class NotificationBoard(models.Model):
     
     user_id = fields.Many2one('res.users', string='Author', default=lambda self: self.env.uid, readonly=True)
     
-    # Switched to Selection field to support statusbar widget correctly
     state = fields.Selection([
         ('draft', 'Draft'),
         ('published', 'Published')

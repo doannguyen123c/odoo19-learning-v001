@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 from odoo import models, fields, api, _
 from odoo.exceptions import AccessError, UserError, ValidationError
 import requests
 import logging
 import hashlib
 from datetime import datetime
-import random  # Để tạo data random demo
+import random
 
 _logger = logging.getLogger(__name__)
 
@@ -26,30 +24,24 @@ class BankNoti(models.Model):
     ]
     
     def unlink(self):
-        # Only allow system administrators to delete records
         if not self.env.user.has_group('base.group_system'):
             raise AccessError(_('Chỉ có quản trị viên mới được phép xóa thông báo ngân hàng.'))
         return super(BankNoti, self).unlink()
 
     @api.model
     def fetch_bank_notifications(self):
-        """Cron job: Đồng bộ thông báo ngân hàng. 
-        USE_DEMO_DATA = True để test với data giả trước khi dùng URL thật."""
-        
-        USE_DEMO_DATA = False  # <--- ĐỔI THÀNH False KHI SẴN SÀNG DÙNG DATA THẬT
-        # USE_DEMO_DATA = True  # <--- ĐỔI THÀNH False KHI SẴN SÀNG DÙNG DATA THẬT
+        USE_DEMO_DATA = False
         
         count_new = 0
         
         if USE_DEMO_DATA:
-            # ------------------- CHẾ ĐỘ DEMO: Tạo data random giả lập -------------------
             _logger.info("Chạy ở chế độ DEMO - Tạo dữ liệu giả lập để test cron")
             
             demo_data_list = [
                 {
                     'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                     'content': f'Tài khoản nhận được {random.randint(1000000, 10000000)} VND từ chuyển khoản',
-                    'bank_account': '1234567890',  # Tài khoản giả
+                    'bank_account': '1234567890',
                     'amount': random.randint(500000, 5000000),
                     'transaction_id': str(random.randint(500000, 5000000)),
                 },
@@ -62,10 +54,9 @@ class BankNoti(models.Model):
                 },
             ]
             
-            data_list = demo_data_list  # Dùng list giả như API thật
+            data_list = demo_data_list
             
         else:
-            # ------------------- CHẾ ĐỘ REAL: Crawl từ URL -------------------
             url = 'https://bimat.2154.123corp.net/response.php'
             try:
                 response = requests.get(url, timeout=15)
@@ -86,7 +77,6 @@ class BankNoti(models.Model):
                 _logger.error("Lỗi xử lý response: %s", e)
                 return
 
-        # ------------------- XỬ LÝ CHUNG: Duyệt data và insert nếu mới -------------------
         for item in data_list:
             notif_time_str = item.get('time', False)
             content = item.get('content', '')
@@ -95,17 +85,11 @@ class BankNoti(models.Model):
             transaction_id = item.get('transaction_id', '')
 
             if not notif_time_str or not content or not bank_account:
-                continue  # Bỏ qua record thiếu field chính
+                continue
 
-            # Tạo transaction_id unique bằng MD5 hash (vì API không có ID gốc)
-            # unique_str = f"{notif_time_str}{content}{bank_account}"
-            # transaction_id = hashlib.md5(unique_str.encode('utf-8')).hexdigest()
-
-            # Kiểm tra duplicate
             if self.search([('transaction_id', '=', transaction_id)], limit=1):
                 continue
 
-            # Tạo record mới (Odoo tự convert string datetime nếu format chuẩn)
             self.create({
                 'notification_time': notif_time_str,
                 'bank_account': bank_account,
