@@ -83,7 +83,7 @@ class SaleOrder(models.Model):
             )
 
         return (
-            "<div style='line-height:1.25;'>"
+            "<div style='line-height:1.25; width:220px; max-width:250px; white-space:normal;'>"
             "<div style='font-weight:600;'>%s</div>"
             "%s"
             "%s"
@@ -100,28 +100,60 @@ class SaleOrder(models.Model):
 
     def _get_ui_products_html(self):
         self.ensure_one()
-        lines = self.order_line.filtered(lambda l: not l.display_type)
+        # Chỉ lấy dòng thường và dòng cha (bỏ qua dòng con đứng lẻ vì nó sẽ được render kèm cha)
+        # Sử dụng getattr để an toàn nếu module combo chưa cài
+        lines = self.order_line.filtered(lambda l: not l.display_type and not getattr(l, 'is_combo_child', False))
+        
         if not lines:
             return ''
 
         items = []
         total_lines = len(lines)
+        
+        # Chỉ hiển thị tối đa 4 dòng sản phẩm chính
         for line in lines[:4]:
             name = line.product_id.display_name or line.name or ''
             qty_str = '%g' % (line.product_uom_qty or 0.0)
-            items.append(
-                "<li style='margin:0 0 2px 0;'>%s <span style='color:#d64541; font-weight:600;'>x%s</span></li>"
-                % (escape(name), escape(qty_str))
-            )
+            
+            # Kiểm tra xem có phải combo cha không
+            child_lines = getattr(line, 'child_line_ids', None)
+            is_combo = bool(child_lines)
+
+            if is_combo:
+                # Dòng Combo Cha
+                items.append(
+                    "<li style='margin:0 0 4px 0;'>"
+                    "<div style='font-weight:700; color:#1f2937;'>%s <span style='color:#d64541;'>x%s</span> <span style='font-size:10px; background:#e5e7eb; color:#374151; padding:1px 4px; border-radius:4px;'>COMBO</span></div>"
+                    % (escape(name), escape(qty_str))
+                )
+                # Dòng Combo Con
+                for child in child_lines:
+                    child_name = child.product_id.display_name or child.name or ''
+                    child_qty = '%g' % (child.product_uom_qty or 0.0)
+                    items.append(
+                        "<div style='padding-left:12px; font-size:12px; color:#6b7280; display:flex; gap:4px; line-height:1.2; margin-top:1px;'>"
+                        "<span style='user-select:none;'>↳</span>"
+                        "<span>%s</span>"
+                        "<span style='color:#9ca3af;'>x%s</span>"
+                        "</div>"
+                        % (escape(child_name), escape(child_qty))
+                    )
+                items.append("</li>")
+            else:
+                # Dòng thường
+                items.append(
+                    "<li style='margin:0 0 2px 0;'>%s <span style='color:#d64541; font-weight:600;'>x%s</span></li>"
+                    % (escape(name), escape(qty_str))
+                )
 
         if total_lines > 4:
             more_count = total_lines - 4
             items.append(
-                "<li style='color:#6b7280;'>+ %s more...</li>" % escape(str(more_count))
+                "<li style='color:#6b7280; font-style:italic; margin-top:2px;'>+ %s sản phẩm khác...</li>" % escape(str(more_count))
             )
 
         return (
-            "<ul style='margin:0; padding-left:16px;'>%s</ul>" % ''.join(items)
+            "<ul style='margin:0; padding-left:8px; list-style:none;'>%s</ul>" % ''.join(items)
         )
 
     def _get_ui_state_badge_html(self):
