@@ -2,15 +2,11 @@ odoo.define('notification_board.notification_board', function (require) {
     'use strict';
 
     var publicWidget = require('web.public.widget');
-    var core = require('web.core');
-    var _t = core._t;
 
     // Notification List Widget
     publicWidget.registry.NotificationList = publicWidget.Widget.extend({
         selector: '.notification-board-container',
-        events: {
-            'click .mark-as-read': '_onMarkAsRead',
-        },
+        events: {},
 
         start: function () {
             var self = this;
@@ -37,29 +33,7 @@ odoo.define('notification_board.notification_board', function (require) {
             }
         },
 
-        _onMarkAsRead: function (ev) {
-            ev.preventDefault();
-            var $target = $(ev.currentTarget);
-            var notificationId = $target.data('notification-id');
-            
-            // Show loading state
-            $target.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> ' + _t('Đang đánh dấu...'));
-            
-            // Call the server to mark as read
-            this._rpc({
-                model: 'notification.board',
-                method: 'set_message_done',
-                args: [[parseInt(notificationId)]],
-            }).then(function () {
-                // Remove the notification from the list
-                $target.closest('.notification-item').fadeOut(300, function() {
-                    $(this).remove();
-                });
-            }).guardedCatch(function (error) {
-                console.error('Lỗi khi đánh dấu đã đọc:', error);
-                $target.prop('disabled', false).text(_t('Đánh dấu đã đọc'));
-            });
-        },
+        // No "mark as read" action here; server side doesn't expose it for this model.
     });
 
     // Notification Detail Widget

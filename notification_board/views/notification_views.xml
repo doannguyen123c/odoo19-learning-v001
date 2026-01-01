@@ -11,17 +11,21 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,published"/>
                 </header>
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                    </div>
-                    <field name="cover_image" widget="image" class="oe_avatar" options="{'preview_image': 'cover_image', 'size': [90, 90]}"/>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>
                         <h1><field name="name" placeholder="Article Title..."/></h1>
                     </div>
                     <group>
                         <group>
-                            <field name="user_id" widget="many2one_avatar_user"/>
                             <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="cover_image" widget="image" options="{'preview_image': 'cover_image', 'size': [240, 240]}"/>
+                            <field name="create_date" readonly="1"/>
+                            <field name="write_date" readonly="1"/>
                         </group>
                     </group>
                     <separator string="Article Content"/>

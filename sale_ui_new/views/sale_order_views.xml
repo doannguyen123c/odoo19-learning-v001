@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_quotation_tree_ui_custom" model="ir.ui.view">
+        <field name="name">sale.order.quotation.tree.ui.custom</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="replace">
+                <list string="Quotations">
+                    <field name="x_ui_order_id_html" string="Order ID" widget="html"/>
+                    <field name="x_ui_customer_html" string="Khách hàng" widget="html"/>
+                    <field name="x_ui_products_html" string="Sản phẩm" widget="html"/>
+                    <field name="amount_total" string="Tổng cộng" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="x_ui_state_badge_html" string="Trạng thái" widget="html"/>
+                    <field name="user_id" string="Salesperson" widget="many2one_avatar_user"/>
+                </list>
+            </xpath>
+        </field>
+    </record>
+</odoo>

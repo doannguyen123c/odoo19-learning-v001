@@ -13,7 +13,7 @@
     """,
     'category': 'Productivity/Communication',
     'author': 'Diego Nguyen',
-    'depends': ['base', 'mail'],
+    'depends': ['base', 'mail', 'website'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

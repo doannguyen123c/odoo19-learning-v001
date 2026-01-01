@@ -15,7 +15,7 @@ class NotificationBoardController(http.Controller):
     def notification_list(self, page=1, **kw):
         """Trang danh sách thông báo (có phân trang)."""
         NotificationBoard = request.env['notification.board'] # Truy cập model từ request.env.
-        domain = [('is_published', '=', True)] # Chỉ lấy tin đã xuất bản.
+        domain = [('state', '=', 'published')] # Chỉ lấy tin đã xuất bản.
         
         # Cấu hình phân trang (Pagination).
         page_count = 10 # Số tin mỗi trang.
@@ -54,7 +54,7 @@ class NotificationBoardController(http.Controller):
         notification = request.env['notification.board'].browse(notification_id)
         
         # Kiểm tra tồn tại và quyền xem.
-        if not notification.exists() or not notification.is_published:
+        if not notification.exists() or notification.state != 'published':
             return request.redirect('/notification_board')
             
         # Đánh dấu đã đọc (nếu dùng tính năng mail.thread).

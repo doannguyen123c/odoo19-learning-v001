@@ -21,7 +21,7 @@
                                         <small t-esc="notification.create_date" 
                                                t-options='{"widget": "date", "format": "dd/MM/yyyy HH:mm"}'/>
                                     </div>
-                                    <p class="mb-1" t-esc="notification.content" t-options='{"widget": "html"}'/>
+                                    <div class="mb-1" t-field="notification.content" t-options='{"widget": "html"}'/>
                                     <small>Người đăng: <t t-esc="notification.user_id.name"/></small>
                                 </a>
                             </t>
