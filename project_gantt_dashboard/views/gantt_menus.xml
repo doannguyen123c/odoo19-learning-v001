@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_project_gantt_dashboard" model="ir.actions.client">
+        <field name="name">Gantt Dashboard</field>
+        <field name="tag">project_gantt_dashboard_tag</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Đưa menu ra ngoài cùng của App Project để dễ thấy -->
+    <!-- parent="project.menu_main_pm" đôi khi bị ẩn nếu không có quyền -->
+    <!-- Thử dùng parent="project.menu_project_config" hoặc tạo menu root con -->
+    
+    <!-- Cách an toàn nhất: Nằm trong menu Tasks (Công việc) -->
+    <menuitem id="menu_project_gantt_dashboard"
+              name="Gantt Dashboard"
+              parent="project.menu_project_management" 
+              action="action_project_gantt_dashboard"
+              sequence="50"/>
+</odoo>

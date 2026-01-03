@@ -133,3 +133,12 @@ class BankNoti(models.Model):
             _logger.info(f"Đồng bộ thành công: {count_new} thông báo mới được tạo.")
         else:
             _logger.info("Không có thông báo mới (hoặc tất cả đã tồn tại).")
+
+    @api.model
+    def check_unnotified_transactions(self):
+        """
+        Placeholder method to satisfy the cron job requirement.
+        This can be implemented later for more advanced notification logic.
+        """
+        _logger.info("Checking unnotified transactions... (Placeholder)")
+        return True

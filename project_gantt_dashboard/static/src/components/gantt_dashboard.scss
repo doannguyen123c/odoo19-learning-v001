@@ -1,0 +1,27 @@
+/* Gantt Dashboard SCSS */
+.o_gantt_dashboard {
+    background-color: #f9f9f9;
+    
+    .o_control_panel {
+        background-color: #ffffff;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .o_gantt_container {
+        /* Đảm bảo container chiếm hết chiều cao còn lại */
+        height: calc(100vh - 100px); 
+        
+        .gantt-container {
+            /* Style cho thư viện Frappe Gantt */
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+    }
+}
+
+/* Custom Frappe Gantt Colors if needed */
+.gantt .bar-wrapper {
+    cursor: pointer;
+}

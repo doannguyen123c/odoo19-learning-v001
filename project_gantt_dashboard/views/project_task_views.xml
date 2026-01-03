@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 
+        TẠM THỜI VÔ HIỆU HÓA TOÀN BỘ VIEW INHERIT ĐỂ DEBUG INSTALLATION
+        
+        Chúng ta sẽ enable lại từng phần sau khi module đã cài đặt thành công.
+        Hiện tại ưu tiên kích hoạt Client Action (Gantt Dashboard).
+    -->
+
+    <!--
+    <record id="view_task_form_gantt_inherit" model="ir.ui.view">
+        <field name="name">project.task.form.gantt.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+             <xpath expr="//notebook" position="inside">
+                 <page string="Gantt Settings" name="gantt_settings">
+                    <group>
+                        <group>
+                            <field name="x_date_start" string="Start Date (Gantt)"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_task_tree_gantt_inherit" model="ir.ui.view">
+        <field name="name">project.task.list.gantt.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_date_start" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    -->
+</odoo>

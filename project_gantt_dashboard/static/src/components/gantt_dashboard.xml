@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="project_gantt_dashboard.GanttDashboard">
+        <div class="o_gantt_dashboard h-100 d-flex flex-column">
+            <!-- HEADER TOOLBAR -->
+            <div class="o_control_panel d-flex flex-wrap align-items-center justify-content-between px-3 py-2 border-bottom bg-view">
+                <div class="o_cp_top_left">
+                    <h3 class="fw-bold mb-0 text-primary">Gantt Dashboard Loaded</h3>
+                </div>
+                
+                <div class="o_cp_top_right d-flex gap-2">
+                    <!-- Project Selector Dropdown -->
+                    <select class="form-select w-auto" t-on-change="onProjectChange" t-model="state.projectId">
+                        <option value="" disabled="true">Select a Project...</option>
+                        <t t-foreach="state.projects" t-as="project" t-key="project.id">
+                            <option t-att-value="project.id">
+                                <t t-esc="project.name"/>
+                            </option>
+                        </t>
+                    </select>
+                    
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary" 
+                            t-att-class="{'active': state.viewMode === 'Day'}"
+                            t-on-click="() => this.onViewModeChange('Day')">Day</button>
+                        <button type="button" class="btn btn-outline-secondary" 
+                            t-att-class="{'active': state.viewMode === 'Week'}"
+                            t-on-click="() => this.onViewModeChange('Week')">Week</button>
+                        <button type="button" class="btn btn-outline-secondary" 
+                            t-att-class="{'active': state.viewMode === 'Month'}"
+                            t-on-click="() => this.onViewModeChange('Month')">Month</button>
+                    </div>
+
+                    <button class="btn btn-secondary" disabled="disabled">
+                        <i class="fa fa-filter me-1"/> Filter
+                    </button>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT (GANTT CHART CONTAINER) -->
+            <div class="o_gantt_container flex-grow-1 position-relative overflow-auto p-3 bg-100" t-ref="gantt-container">
+                <div class="text-center text-muted mt-5">
+                    <i class="fa fa-area-chart fa-3x mb-3"/>
+                    <h4>Gantt Chart Container</h4>
+                    <p>Frappe Gantt will be rendered here in the next step.</p>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
